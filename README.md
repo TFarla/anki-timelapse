@@ -1,8 +1,6 @@
 Transform progress in Anki into a timelapse video
 
-<video controls="" autoplay="" muted="" loop="">
-    <source src="https://tfarla.github.io/kanji/video.mp4">
-</video>
+![kanji.gif](http://giphygifs.s3.amazonaws.com/media/3d6ZMl9NBC5tH9JA98/giphy.gif)
 
 **Note**: This project will not work out of the box on your machine.
 It's been developed to mainly work on one machine, my machine. If you are interested in generating fancy anki timelapses. Please contact me by making an issue on this repository. I will only make this repository reusable when people are interested. 
