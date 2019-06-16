@@ -1,0 +1,1 @@
+ PYTHONPATH=${PYTHONPATH}:${PWD} pipenv run pytest --cov anki_timelapse tests
