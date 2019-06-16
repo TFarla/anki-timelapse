@@ -2,6 +2,7 @@ import os
 import sqlite3
 from anki_timelapse.database import Database
 from anki_timelapse.revlog import Revlog
+from datetime import datetime
 
 current_dir = os.path.dirname(__file__)
 
@@ -31,6 +32,17 @@ def test_read_revlog_order():
         revlog_asc = list(db.get_revlogs())
         assert revlog_asc[0].id == revlog_desc[-1].id
         assert revlog_desc[0].id == revlog_asc[-1].id
+
+
+def test_read_revlog_for_a_given_day():
+    with Database(':memory:') as db:
+        setup_db(db)
+
+        start_timestamp = 1560577038325
+        end_timestamp = 1560577123969
+
+        logs = db.get_revlogs(start_timestamp=start_timestamp, end_timestamp=end_timestamp)
+        assert len(list(logs)) == 4
 
 
 def setup_db(db: Database):
