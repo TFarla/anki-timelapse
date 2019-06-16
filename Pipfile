@@ -9,6 +9,7 @@ pytest-cov = "*"
 pycodestyle = "*"
 autopep8 = "*"
 mypy = "*"
+decorator = "*"
 
 [packages]
 

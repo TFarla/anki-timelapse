@@ -1,5 +1,7 @@
 import sqlite3
 from anki_timelapse.revlog import Revlog
+from anki_timelapse.card import Card
+from anki_timelapse.note import Note
 from datetime import datetime, timedelta
 from typing import Tuple
 
@@ -64,6 +66,38 @@ class Database:
         cursor.execute(query, (start_timestamp, end_timestamp))
         for log in cursor.fetchall():
             yield Revlog(log[0], log[1], log[2], log[3])
+
+    def get_cards(self, card_ids):
+        """Gets the cards from the database
+
+        Args:
+            card_ids: a list of integer card identifiers
+
+        Returns:
+            Generator containing cards that match any of the card_ids
+        """
+        assert self.is_connected()
+        query = 'select id, did, nid from cards where id in (%s)' % str.join(',', [
+            '?' for i in card_ids])
+        cursor = self.__conn.execute(query, card_ids)
+        for card in cursor.fetchall():
+            yield Card(card[0], card[1], card[2])
+
+    def get_notes(self, note_ids):
+        """Get notes from the anki collection
+
+        Args:
+            node_ids: a list of note identifiers
+
+        Returns:
+            Generator containing notes that match any of the note_ids
+        """
+        assert self.is_connected()
+        query = 'select id, flds from notes where id in (%s)' % str.join(',', [
+            '?' for i in note_ids])
+        cursor = self.__conn.execute(query, note_ids)
+        for note in cursor.fetchall():
+            yield Note(note[0], note[1])
 
     def __exit__(self, type, value, traceback):
         if not self.__conn is None:
