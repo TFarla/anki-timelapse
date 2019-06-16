@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Anki timelapse</title>
+    <style>
+        .bad {
+            background-color: #F25D50;
+        }
+
+        .normal {
+            background-color: #F26849;
+        }
+
+        .intermediate {
+            background-color: #F2C335;
+        }
+
+        .good {
+            color: white;
+            background-color: #22405F;
+        }
+
+        .great {
+            color: white;
+            background-color: #23648C;
+        }
+        .box {
+            height: 25px;
+            width:100px;
+            padding: 0;
+            margin: 0;
+            float: left;
+        }
+
+        .kanji {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div style="height: 50px;">
+        <b style="float:left">{{date.date()}}</b>
+        <div style="float:right">
+            <span style="float:left">bad</span>
+                <div class="bad box"></div>
+                <div class="normal box"></div>
+                <div class="intermediate box"></div>
+                <div class="good box"></div>
+                <div class="great box"></div>
+                <span style="float:right">great</span>
+        </div>
+    </div>
+        <div class="kanji">
+        {% for key, meta in card_meta.items() %}
+            <span class="{{meta.class}}">{{meta.note}}</span>
+        {% endfor %}
+    </div>
+</body>
+</html>

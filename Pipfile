@@ -12,6 +12,8 @@ mypy = "*"
 decorator = "*"
 
 [packages]
+jinja2 = "*"
+imgkit = "*"
 
 [requires]
 python_version = "3.7"

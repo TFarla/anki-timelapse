@@ -1,14 +1,10 @@
 class Revlog:
-    __id = None
-    __card_id = None
-    __ease = None
-    __type = None
-
-    def __init__(self, id, card_id, ease, type):
+    def __init__(self, id, card_id, ease, type, interval_level):
         self.__id = id
         self.__card_id = card_id
         self.__ease = ease
         self.__type = type
+        self.__interval_level = interval_level
 
     @property
     def id(self):
@@ -25,3 +21,7 @@ class Revlog:
     @property
     def type(self):
         return self.__type
+
+    @property
+    def interval_level(self):
+        return self.__interval_level

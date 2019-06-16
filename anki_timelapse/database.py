@@ -21,6 +21,7 @@ class Database:
 
     def __enter__(self):
         self.__conn = sqlite3.connect(self.__collection_path)
+        self.__conn.row_factory = sqlite3.Row
         return self
 
     def is_connected(self):
@@ -59,15 +60,16 @@ class Database:
             id,
             cid,
             ease,
-            type 
+            type,
+            ivl
         from revlog 
         where id > ? and id < ? %s''' % order_by
 
         cursor.execute(query, (start_timestamp, end_timestamp))
         for log in cursor.fetchall():
-            yield Revlog(log[0], log[1], log[2], log[3])
+            yield Revlog(log['id'], log['cid'], log['ease'], log['type'], log['ivl'])
 
-    def get_cards(self, card_ids):
+    def get_cards(self, deck_id=None, card_ids = None):
         """Gets the cards from the database
 
         Args:
@@ -77,11 +79,17 @@ class Database:
             Generator containing cards that match any of the card_ids
         """
         assert self.is_connected()
-        query = 'select id, did, nid from cards where id in (%s)' % str.join(',', [
-            '?' for i in card_ids])
-        cursor = self.__conn.execute(query, card_ids)
+        if card_ids is None:
+            query = 'select id, did, nid from cards where did = ?'
+            params = (str(deck_id),)
+            cursor = self.__conn.execute(query, params)
+        else:
+            query = 'select id, did, nid from cards where id in (%s)' % str.join(',', [
+                '?' for i in card_ids])
+            cursor = self.__conn.execute(query, card_ids)
+
         for card in cursor.fetchall():
-            yield Card(card[0], card[1], card[2])
+            yield Card(card['id'], card['did'], card['nid'])
 
     def get_notes(self, note_ids):
         """Get notes from the anki collection
@@ -97,7 +105,34 @@ class Database:
             '?' for i in note_ids])
         cursor = self.__conn.execute(query, note_ids)
         for note in cursor.fetchall():
-            yield Note(note[0], note[1])
+            yield Note(note['id'], note['flds'].split(u"\x1f"))
+
+    def get_rows(self, from_timestamp, end_timestamp, deck_id):
+        assert self.is_connected()
+        query = '''
+            select 
+                l.id as lid,
+                l.ease as lease,
+                l.type as ltype,
+                max(l.ivl) as ivl,
+                l.cid as cid,
+                n.flds as flds,
+                c.did as did,
+                c.nid as nid
+            from revlog as l 
+            join cards as c on c.id = l.cid
+            JOIN notes as n on n.id = c.nid
+            where l.id > ? and l.id < ?
+            and c.did = ?
+            group by l.cid 
+        '''
+        cursor = self.__conn.execute(query, (from_timestamp, end_timestamp, deck_id))
+        for row in cursor.fetchall():
+            log = Revlog(row['lid'], row['cid'], row['lease'],
+                         row['ltype'], row['ivl'])
+            card = Card(row['cid'], row['did'], row['nid'])
+            note = Note(row['nid'], row['flds'].split(u"\x1f"))
+            yield (log, card, note)
 
     def __exit__(self, type, value, traceback):
         if not self.__conn is None:

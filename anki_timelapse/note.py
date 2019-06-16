@@ -13,3 +13,4 @@ class Note:
     @property
     def fields(self):
         return self.__fields
+    
